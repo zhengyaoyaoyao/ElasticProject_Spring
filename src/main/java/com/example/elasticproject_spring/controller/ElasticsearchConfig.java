@@ -1,4 +1,4 @@
-package org.example;
+package com.example.elasticproject_spring.controller;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
@@ -24,6 +24,8 @@ import org.springframework.core.io.ClassPathResource;
 import javax.net.ssl.SSLContext;
 import java.io.IOException;
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -31,7 +33,8 @@ import java.util.Objects;
  * @author petenover@sina.com
  * @date 2021/9/22 17:27
  */
-@Configuration@Slf4j
+@Configuration
+@Slf4j
 public class ElasticsearchConfig {
 	@Value("#{'${es.hosts}'.split(',')}")
 	private List<String> hosts;
@@ -86,10 +89,12 @@ public class ElasticsearchConfig {
 	}
 
 	private RestClientBuilder restClientBuilder(Boolean sslEnable) {
+		System.out.println(this.hosts);
 		HttpHost[] esHosts = hosts.stream().filter(StringUtils::isNotBlank).map(it -> {
 			String[] split = it.split(REGEX_COLON);
 			return new HttpHost(split[0], Integer.parseInt(split[1]), sslEnable ? SCHEME_HTTPS : SCHEME_HTTP);
 		}).toArray(HttpHost[]::new);
+
 		return RestClient.builder(esHosts).setRequestConfigCallback(requestConfigBuilder -> {
 			requestConfigBuilder.setConnectTimeout(connectTimeOut);
 			requestConfigBuilder.setSocketTimeout(socketTimeOut);
